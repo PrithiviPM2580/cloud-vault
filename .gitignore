@@ -69,3 +69,4 @@ temp/
 # Misc
 # ==============================
 *.local
+server/src/generated/
