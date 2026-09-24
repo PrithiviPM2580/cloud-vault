@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:3000
+@api = {{baseUrl}}/api
+@folderId = 757f60bc-cc6c-44c4-9824-c7b95c145e64
+
+### Create Folder
+POST {{api}}/folders
+Content-Type: application/json
+
+{
+  "name": "Father",
+  "parentId": "{{folderId}}"
+}
