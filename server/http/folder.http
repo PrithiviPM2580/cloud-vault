@@ -13,3 +13,6 @@ Content-Type: application/json
 
 #### Get Folders
 GET {{api}}/folders?parentId={{folderId}}
+
+#### Get Folder Details
+GET {{api}}/folders/{{folderId}}

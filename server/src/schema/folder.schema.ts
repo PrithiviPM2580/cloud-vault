@@ -1,7 +1,7 @@
 import type { InferSchemas } from "zod-express-validator";
 import { z } from "zod";
 
-export const folderSchema = z.object({
+const folderSchema = z.object({
   name: z.string(),
   parentId: z.string().nullable(),
   path: z.array(z.string()),
@@ -12,6 +12,25 @@ export const folderSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
 });
+
+const breadcrumbSchema = z.object({
+  id: z.union([z.uuid(), z.null()]),
+  name: z.string(),
+});
+
+export const getFolderDetailsSchema = {
+  params: z.object({
+    id: z.uuid(),
+  }),
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: z.object({
+      folder: folderSchema,
+      breadcrumbs: z.array(breadcrumbSchema),
+    }),
+  }),
+};
 
 export const getFoldersSchema = {
   query: z.object({
@@ -38,3 +57,6 @@ export const createFolderSchema = {
 
 export type CreateFolderInput = InferSchemas<typeof createFolderSchema>;
 export type GetFoldersInput = InferSchemas<typeof getFoldersSchema>;
+export type GetFolderDetailsInput = InferSchemas<typeof getFolderDetailsSchema>;
+
+export type Breadcrumb = z.infer<typeof breadcrumbSchema>;
