@@ -5,6 +5,7 @@ import type {
   CreateFolderInput,
   GetFolderDetailsInput,
   GetFoldersInput,
+  RenameFolderInput,
 } from "@/schema/folder.schema";
 import { AppError } from "@/utils/app-error.utils";
 
@@ -136,4 +137,36 @@ export const getFolderDetails = async (
     folder,
     breadcrumbs,
   };
+};
+
+export const renameFolder = async (
+  params: RenameFolderInput["params"],
+  body: RenameFolderInput["body"],
+  ownerId: string,
+): Promise<Folder> => {
+  const { id } = params;
+  const { name } = body;
+
+  const folder = await prisma.folder.findFirst({
+    where: {
+      id,
+      ownerId,
+      isTrashed: false,
+    },
+  });
+
+  if (!folder) {
+    throw AppError.notFound("Folder not found");
+  }
+
+  const updatedFolder = await prisma.folder.update({
+    where: {
+      id: folder.id,
+    },
+    data: {
+      name,
+    },
+  });
+
+  return updatedFolder;
 };

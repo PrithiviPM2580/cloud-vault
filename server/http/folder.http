@@ -16,3 +16,11 @@ GET {{api}}/folders?parentId={{folderId}}
 
 #### Get Folder Details
 GET {{api}}/folders/{{folderId}}
+
+#### Rename Folder
+PATCH {{api}}/folders/{{folderId}}
+Content-Type: application/json
+
+{
+  "name": "New Folder Name"
+}
