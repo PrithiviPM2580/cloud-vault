@@ -5,6 +5,7 @@ import type {
   CreateFolderInput,
   GetFolderDetailsInput,
   GetFoldersInput,
+  MoveFolderInput,
   RenameFolderInput,
 } from "@/schema/folder.schema";
 import { AppError } from "@/utils/app-error.utils";
@@ -167,6 +168,109 @@ export const renameFolder = async (
       name,
     },
   });
+
+  return updatedFolder;
+};
+
+export const moveFolder = async (
+  params: MoveFolderInput["params"],
+  body: MoveFolderInput["body"],
+  ownerId: string,
+): Promise<Folder> => {
+  const { id } = params;
+  const { parentId } = body;
+
+  if (parentId === id) {
+    throw AppError.badRequest("Cannot move folder to itself");
+  }
+
+  const folder = await prisma.folder.findFirst({
+    where: {
+      id,
+      ownerId,
+      isTrashed: false,
+    },
+  });
+
+  if (!folder) {
+    throw AppError.notFound("Folder not found");
+  }
+
+  let newPath: string[] = [];
+
+  if (parentId) {
+    const parentFolder = await prisma.folder.findFirst({
+      where: {
+        id: parentId,
+        ownerId,
+        isTrashed: false,
+      },
+    });
+
+    if (!parentFolder) {
+      throw AppError.notFound("Parent folder not found");
+    }
+
+    if (parentFolder.path.includes(id)) {
+      throw AppError.badRequest("Cannot move folder to its own subfolder");
+    }
+
+    newPath = [...parentFolder.path, parentFolder.id];
+  }
+
+  await prisma.folder.update({
+    where: {
+      id: folder.id,
+    },
+    data: {
+      parentId: parentId ?? null,
+      path: newPath,
+    },
+  });
+
+  const descendants = await prisma.folder.findMany({
+    where: {
+      ownerId,
+      isTrashed: false,
+      path: {
+        has: folder.id,
+      },
+    },
+    select: {
+      id: true,
+      path: true,
+    },
+  });
+
+  await Promise.all(
+    descendants.map(async (descendant) => {
+      const folderIndex = descendant.path.findIndex(
+        (folderId) => folderId === folder.id,
+      );
+      const subPath =
+        folderIndex !== -1 ? descendant.path.slice(folderIndex + 1) : [];
+      const updatedPath = [...newPath, folder.id, ...subPath];
+
+      await prisma.folder.update({
+        where: {
+          id: descendant.id,
+        },
+        data: {
+          path: updatedPath,
+        },
+      });
+    }),
+  );
+
+  const updatedFolder = await prisma.folder.findUnique({
+    where: {
+      id: folder.id,
+    },
+  });
+
+  if (!updatedFolder) {
+    throw AppError.internalServerError("Failed to retrieve updated folder");
+  }
 
   return updatedFolder;
 };
