@@ -1,0 +1,56 @@
+### Better Auth API Test File
+
+@baseUrl = http://localhost:3000
+@authPath = /api/auth
+
+### Health Check / Get CSRF Token
+GET {{baseUrl}}{{authPath}}/get-session
+Content-Type: application/json
+
+### Sign Up with Email & Password
+POST {{baseUrl}}{{authPath}}/sign-up/email
+Origin: http://localhost:3000
+Content-Type: application/json
+
+{
+	"email": "user@example.com",
+	"password": "password123",
+	"name": "Test User"
+}
+
+### Sign In with Email & Password
+# @name signIn
+POST {{baseUrl}}{{authPath}}/sign-in/email
+Origin: http://localhost:3000
+Content-Type: application/json
+
+{
+	"email": "user@example.com",
+	"password": "password123"
+}
+
+### Capture Session Token (Requires REST Client extension)
+@sessionToken = {{signIn.response.headers.$set-cookie}}
+
+### Get Current Session (Authenticated)
+GET {{baseUrl}}{{authPath}}/get-session
+Cookie: {{sessionToken}}
+
+### Sign Out
+POST {{baseUrl}}{{authPath}}/sign-out
+Origin: http://localhost:3000
+Cookie: {{sessionToken}}
+
+### List User Accounts (Authenticated)
+GET {{baseUrl}}{{authPath}}/list-accounts
+Cookie: {{sessionToken}}
+
+### Update User (Authenticated)
+POST {{baseUrl}}{{authPath}}/update-user
+Content-Type: application/json
+Cookie: {{sessionToken}}
+
+{
+	"name": "Updated Name",
+	"image": "https://example.com/avatar.png"
+}
