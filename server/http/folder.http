@@ -24,3 +24,11 @@ Content-Type: application/json
 {
   "name": "New Folder Name"
 }
+
+#### Move Folder
+PATCH {{api}}/folders/{{folderId}}/move
+Content-Type: application/json
+
+{
+  "parentId": "new-parent-folder-id"
+}

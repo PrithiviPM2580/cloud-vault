@@ -69,9 +69,24 @@ export const renameFolderSchema = {
   }),
 };
 
+export const moveFolderSchema = {
+  params: z.object({
+    id: z.uuid(),
+  }),
+  body: z.object({
+    parentId: z.uuid().nullable().optional(),
+  }),
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: folderSchema,
+  }),
+};
+
 export type CreateFolderInput = InferSchemas<typeof createFolderSchema>;
 export type GetFoldersInput = InferSchemas<typeof getFoldersSchema>;
 export type GetFolderDetailsInput = InferSchemas<typeof getFolderDetailsSchema>;
 export type RenameFolderInput = InferSchemas<typeof renameFolderSchema>;
+export type MoveFolderInput = InferSchemas<typeof moveFolderSchema>;
 
 export type Breadcrumb = z.infer<typeof breadcrumbSchema>;
