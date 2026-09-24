@@ -7,6 +7,9 @@ POST {{api}}/folders
 Content-Type: application/json
 
 {
-  "name": "Father",
-  "parentId": "{{folderId}}"
+  "name": "Hari",
+  "parentId": null
 }
+
+#### Get Folders
+GET {{api}}/folders?parentId={{folderId}}

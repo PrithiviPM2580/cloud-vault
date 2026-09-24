@@ -1,6 +1,9 @@
 import type { Folder } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma-client.lib";
-import type { CreateFolderInput } from "@/schema/folder.schema";
+import type {
+  CreateFolderInput,
+  GetFoldersInput,
+} from "@/schema/folder.schema";
 import { AppError } from "@/utils/app-error.utils";
 
 export const createFolder = async (
@@ -50,4 +53,24 @@ export const createFolder = async (
   });
 
   return newFolder;
+};
+
+export const getFolders = async (
+  query: GetFoldersInput["query"],
+  ownerId: string,
+): Promise<Folder[]> => {
+  const { parentId } = query;
+
+  const folders = await prisma.folder.findMany({
+    where: {
+      ownerId: ownerId,
+      parentId: parentId ?? null,
+      isTrashed: false,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  return folders;
 };
