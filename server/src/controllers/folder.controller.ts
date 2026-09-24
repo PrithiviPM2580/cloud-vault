@@ -3,6 +3,7 @@ import type {
   CreateFolderValidator,
   GetFolderDetailsValidator,
   GetFoldersValidator,
+  RenameFolderValidator,
 } from "@/validator/folder.validator";
 import * as folderService from "@/services/folder.service";
 import { AppError } from "@/utils/app-error.utils";
@@ -65,5 +66,24 @@ export const getFolderDetails: Controller<GetFolderDetailsValidator> = async (
       folder,
       breadcrumbs,
     },
+  });
+};
+
+export const renameFolder: Controller<RenameFolderValidator> = async (
+  req,
+  res,
+) => {
+  const userId = req.session?.user?.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authenticated");
+  }
+
+  const folder = await folderService.renameFolder(req.params, req.body, userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Folder renamed successfully",
+    data: folder,
   });
 };

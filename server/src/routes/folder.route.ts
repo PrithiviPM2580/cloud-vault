@@ -2,6 +2,7 @@ import {
   createFolderValidator,
   getFolderDetailsValidator,
   getFoldersValidator,
+  renameFolderValidator,
 } from "@/validator/folder.validator";
 import { Router } from "express";
 import * as folderController from "@/controllers/folder.controller";
@@ -24,4 +25,8 @@ folderRouter
     getFolderDetailsValidator,
     folderController.getFolderDetails,
   );
+
+folderRouter
+  .route("/:folderId/rename")
+  .patch(requireAuth, renameFolderValidator, folderController.renameFolder);
 export default folderRouter;
