@@ -12,10 +12,138 @@ datasource db {
   provider = "postgresql"
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  authorId  Int?
+model User {
+  id            String  @id @default(uuid()) @db.Uuid
+  name          String  @db.VarChar(255)
+  email         String  @unique @db.VarChar(255)
+  emailVerified Boolean @default(false)
+  image         String?
+  password      String? @db.VarChar(255)
+  storageUsed   BigInt  @default(0)
+  storageLimit  BigInt  @default(1073741824)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+
+  folders    Folder[]
+  files      File[]
+  shareLinks ShareLink[]
+  sessions   Session[]
+  accounts   Account[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  token     String   @unique
+  expiresAt DateTime @db.Timestamptz(6)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(uuid()) @db.Uuid
+  userId                String    @db.Uuid
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(6)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(6)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime  @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(uuid()) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([identifier, value])
+  @@map("verifications")
+}
+
+model Folder {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(255)
+  parentId  String?   @map("parent_id") @db.Uuid
+  ownerId   String    @map("owner_id") @db.Uuid
+  path      String[]  @default([]) @db.Uuid
+  isTrashed Boolean   @default(false) @map("is_trashed")
+  trashedAt DateTime? @map("trashed_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  parent   Folder?  @relation("FolderParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children Folder[] @relation("FolderParent")
+  files    File[]
+
+  @@index([ownerId, parentId, isTrashed], map: "idx_folders_owner_parent")
+  @@index([ownerId, isTrashed], map: "idx_folders_owner_trashed")
+  @@map("folders")
+}
+
+model File {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @db.VarChar(255)
+  originalName String    @map("original_name") @db.VarChar(255)
+  mimeType     String    @map("mime_type") @db.VarChar(128)
+  size         BigInt
+  s3Key        String    @unique @map("s3_key") @db.VarChar(512)
+  folderId     String?   @map("folder_id") @db.Uuid
+  ownerId      String    @map("owner_id") @db.Uuid
+  isTrashed    Boolean   @default(false) @map("is_trashed")
+  trashedAt    DateTime? @map("trashed_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  folder Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, folderId, isTrashed], map: "idx_files_owner_folder")
+  @@index([ownerId, isTrashed, createdAt(sort: Desc)], map: "idx_files_owner_trashed_date")
+  @@index([ownerId, isTrashed, name], map: "idx_files_owner_trashed_name")
+  @@map("files")
+}
+
+model ShareLink {
+  id           String    @id @default(uuid()) @db.Uuid
+  token        String    @unique @db.VarChar(64)
+  resourceType String    @map("resource_type") @db.VarChar(20)
+  resourceId   String    @map("resource_id") @db.Uuid
+  ownerId      String    @map("owner_id") @db.Uuid
+  permission   String    @default("download") @db.VarChar(20)
+  expiresAt    DateTime? @map("expires_at") @db.Timestamptz(6)
+  accessCount  Int       @default(0) @map("access_count")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@unique([resourceId, ownerId], map: "unique_resource_owner")
+  @@index([ownerId, createdAt(sort: Desc)], map: "idx_shares_owner")
+  @@index([resourceId], map: "idx_shares_resource")
+  @@map("share_links")
 }
