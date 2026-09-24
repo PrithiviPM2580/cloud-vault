@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { auth } from "@/lib/auth.lib";
 import morgan from "morgan";
 import cors from "cors";
+import { globalError } from "./middlewares/global-error.middleware";
 
 const app: Application = express();
 
@@ -23,5 +24,7 @@ app.use(
 app.use(morgan("dev"));
 
 app.use(router);
+
+app.use(globalError);
 
 export default app;
