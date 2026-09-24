@@ -1,7 +1,9 @@
 import type { Folder } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma-client.lib";
 import type {
+  Breadcrumb,
   CreateFolderInput,
+  GetFolderDetailsInput,
   GetFoldersInput,
 } from "@/schema/folder.schema";
 import { AppError } from "@/utils/app-error.utils";
@@ -73,4 +75,65 @@ export const getFolders = async (
   });
 
   return folders;
+};
+
+export const getFolderDetails = async (
+  params: GetFolderDetailsInput["params"],
+  ownerId: string,
+): Promise<{ folder: Folder; breadcrumbs: Breadcrumb[] }> => {
+  const { id } = params;
+
+  const folder = await prisma.folder.findFirst({
+    where: {
+      id,
+      ownerId,
+      isTrashed: false,
+    },
+  });
+
+  if (!folder) {
+    throw AppError.notFound("Folder not found");
+  }
+
+  const anchestorsIds = folder.path || [];
+
+  let anchestors: Breadcrumb[] = [];
+
+  if (anchestorsIds.length > 0) {
+    anchestors = await prisma.folder.findMany({
+      where: {
+        id: {
+          in: anchestorsIds,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  }
+
+  const anchestorsMap = new Map(
+    anchestors.map((anchestor) => [anchestor.id, anchestor.name]),
+  );
+
+  const breadcrumbs: Breadcrumb[] = [
+    {
+      id: null,
+      name: "My Drive",
+    },
+    ...anchestorsIds.map((anchestorId) => ({
+      id: anchestorId,
+      name: anchestorsMap.get(anchestorId) || "Unknown",
+    })),
+    {
+      id: folder.id,
+      name: folder.name,
+    },
+  ];
+
+  return {
+    folder,
+    breadcrumbs,
+  };
 };

@@ -1,6 +1,7 @@
 import type { Controller } from "@/types/index.type";
 import type {
   CreateFolderValidator,
+  GetFolderDetailsValidator,
   GetFoldersValidator,
 } from "@/validator/folder.validator";
 import * as folderService from "@/services/folder.service";
@@ -39,5 +40,30 @@ export const getFolders: Controller<GetFoldersValidator> = async (req, res) => {
     statusCode: 200,
     message: "Folders retrieved successfully",
     data: folders,
+  });
+};
+
+export const getFolderDetails: Controller<GetFolderDetailsValidator> = async (
+  req,
+  res,
+) => {
+  const userId = req.session?.user?.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authenticated");
+  }
+
+  const { folder, breadcrumbs } = await folderService.getFolderDetails(
+    req.params,
+    userId,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Folder details retrieved successfully",
+    data: {
+      folder,
+      breadcrumbs,
+    },
   });
 };
