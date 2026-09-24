@@ -13,6 +13,17 @@ export const folderSchema = z.object({
   updatedAt: z.date(),
 });
 
+export const getFoldersSchema = {
+  query: z.object({
+    parentId: z.uuid().optional(),
+  }),
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: z.array(folderSchema),
+  }),
+};
+
 export const createFolderSchema = {
   body: z.object({
     name: z.string().trim().min(1, "Folder name is required."),
@@ -26,3 +37,4 @@ export const createFolderSchema = {
 };
 
 export type CreateFolderInput = InferSchemas<typeof createFolderSchema>;
+export type GetFoldersInput = InferSchemas<typeof getFoldersSchema>;
