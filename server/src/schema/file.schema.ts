@@ -69,8 +69,25 @@ export const getFilesSchema = {
   }),
 };
 
+export const getFilePreviewUrlSchema = {
+  params: z.object({
+    id: z.string(),
+  }),
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: z.object({
+      file: fileSchema,
+      url: z.string(),
+    }),
+  }),
+};
+
 export type UploadFilesInput = InferSchemas<typeof uploadFilesSchema>;
 export type GetFilesQuery = InferSchemas<typeof getFilesSchema>;
+export type GetFilePreviewUrlInput = InferSchemas<
+  typeof getFilePreviewUrlSchema
+>;
 
 export type FileSort = z.infer<typeof fileSortSchema>;
 export type Pagination = z.infer<typeof paginationSchema>;

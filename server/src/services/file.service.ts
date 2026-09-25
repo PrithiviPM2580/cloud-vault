@@ -1,21 +1,37 @@
-import type { File, Prisma,User} from "@/generated/prisma/client";
+import type { File, Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma-client.lib";
 import type {
+  GetFilePreviewUrlInput,
   GetFilesQuery,
   Pagination,
   UploadFilesInput,
 } from "@/schema/file.schema";
 import { AppError } from "@/utils/app-error.util";
-import { uploadFileToS3 } from "@/utils/s3.util";
+import { getSignedUrlForS3Upload, uploadFileToS3 } from "@/utils/s3.util";
 import * as storageService from "@/services/storage.service";
 import { sortMap } from "@/utils/constant.util";
 
 export const uploadFiles = async (
   files: Express.Multer.File[],
-  user: User,
+  userId: string,
   body: UploadFilesInput["body"],
 ): Promise<File[]> => {
   const { folderId } = body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      storageLimit: true,
+      storageUsed: true,
+    },
+  });
+
+  if (!user) {
+    throw AppError.notFound("User not found");
+  }
 
   let targetFolderId: string | null = null;
 
@@ -132,4 +148,26 @@ export const getFiles = async (
       totalPages: Math.ceil(totalFiles / limit),
     },
   };
+};
+
+export const getFilePreviewUrl = async (
+  params: GetFilePreviewUrlInput["params"],
+  ownerId: string,
+): Promise<{ file: File; url: string }> => {
+  const { id } = params;
+
+  const file = await prisma.file.findFirst({
+    where: {
+      id,
+      ownerId,
+    },
+  });
+
+  if (!file) {
+    throw AppError.notFound("File not found");
+  }
+
+  const url = await getSignedUrlForS3Upload(file.s3Key);
+
+  return { file, url };
 };
