@@ -33,3 +33,6 @@ Content-Type: application/json
 {
   "folderId": "{{folderId}}"
 }
+
+### Soft Delete File
+DELETE {{api}}/files/{{fileId}}/soft-delete  
