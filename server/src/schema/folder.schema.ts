@@ -94,6 +94,7 @@ export const softDeleteFolderSchema = {
 };
 
 export const restoreFolderSchema = softDeleteFolderSchema;
+export const permanentDeleteFolderSchema = softDeleteFolderSchema;
 
 export type CreateFolderInput = InferSchemas<typeof createFolderSchema>;
 export type GetFoldersInput = InferSchemas<typeof getFoldersSchema>;
@@ -102,5 +103,8 @@ export type RenameFolderInput = InferSchemas<typeof renameFolderSchema>;
 export type MoveFolderInput = InferSchemas<typeof moveFolderSchema>;
 export type SoftDeleteFolderInput = InferSchemas<typeof softDeleteFolderSchema>;
 export type RestoreFolderInput = InferSchemas<typeof restoreFolderSchema>;
+export type PermanentDeleteFolderInput = InferSchemas<
+  typeof permanentDeleteFolderSchema
+>;
 
 export type Breadcrumb = z.infer<typeof breadcrumbSchema>;
