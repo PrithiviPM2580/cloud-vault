@@ -25,3 +25,11 @@ Content-Type: application/json
 {
   "name": "new-file-name.txt"
 }
+
+### Move File
+PATCH {{api}}/files/{{fileId}}/move
+Content-Type: application/json
+
+{
+  "folderId": "{{folderId}}"
+}

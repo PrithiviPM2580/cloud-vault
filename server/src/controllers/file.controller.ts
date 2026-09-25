@@ -3,6 +3,7 @@ import { AppError } from "@/utils/app-error.util";
 import type {
   GetFilePreviewUrlValidator,
   GetFilesValidator,
+  MoveFileValidator,
   RenameFileValidator,
   UploadFilesValidator,
 } from "@/validator/file.validator";
@@ -85,6 +86,22 @@ export const renameFile: Controller<RenameFileValidator> = async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     message: "File renamed successfully",
+    data: files,
+  });
+};
+
+export const moveFile: Controller<MoveFileValidator> = async (req, res) => {
+  const userId = req.session?.user.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authorized");
+  }
+
+  const files = await fileService.moveFile(req.params, req.body, userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "File moved successfully",
     data: files,
   });
 };

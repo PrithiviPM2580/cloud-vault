@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma-client.lib";
 import type {
   GetFilePreviewUrlInput,
   GetFilesQuery,
+  MoveFileInput,
   Pagination,
   RenameFileInput,
   UploadFilesInput,
@@ -11,6 +12,7 @@ import { AppError } from "@/utils/app-error.util";
 import { getSignedUrlForS3Upload, uploadFileToS3 } from "@/utils/s3.util";
 import * as storageService from "@/services/storage.service";
 import { sortMap } from "@/utils/constant.util";
+import { file } from "bun";
 
 export const uploadFiles = async (
   files: Express.Multer.File[],
@@ -189,6 +191,50 @@ export const renameFile = async (
     },
     data: {
       name,
+    },
+  });
+
+  if (files.length === 0) {
+    throw AppError.notFound("File not found");
+  }
+
+  return files;
+};
+
+export const moveFile = async (
+  params: MoveFileInput["params"],
+  body: MoveFileInput["body"],
+  ownerId: string,
+): Promise<File[]> => {
+  const { id } = params;
+  const { folderId } = body;
+
+  const targetFolderId = folderId ?? null;
+
+  if (targetFolderId) {
+    const destinationFolder = await prisma.folder.findFirst({
+      where: {
+        id: targetFolderId,
+        ownerId,
+        isTrashed: false,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!destinationFolder) {
+      throw AppError.notFound("Destination folder not found");
+    }
+  }
+  const files = await prisma.file.updateManyAndReturn({
+    where: {
+      id,
+      ownerId,
+      isTrashed: false,
+    },
+    data: {
+      folderId: targetFolderId,
     },
   });
 
