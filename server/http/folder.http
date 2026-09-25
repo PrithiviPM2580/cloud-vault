@@ -35,3 +35,6 @@ Content-Type: application/json
 
 #### Soft Delete Folder
 DELETE  {{api}}/folders/{{folderId}}/soft-delete
+
+#### Restore Folder
+PATCH {{api}}/folders/{{folderId}}/restore

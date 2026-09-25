@@ -297,3 +297,24 @@ export const softDeleteFolder = async (
 
   await storageService.softDeleteFolderHierarchy(folder.id, ownerId);
 };
+
+export const restoreFolder = async (
+  params: SoftDeleteFolderInput["params"],
+  ownerId: string,
+): Promise<void> => {
+  const { id } = params;
+
+  const folder = await prisma.folder.findFirst({
+    where: {
+      id,
+      ownerId,
+      isTrashed: true,
+    },
+  });
+
+  if (!folder) {
+    throw AppError.notFound("Folder not found");
+  }
+
+  await storageService.restoreFolderHierarchy(folder.id, ownerId);
+};

@@ -97,3 +97,40 @@ export const softDeleteFolderHierarchy = async (
     await cleanupShareLinks(tx, fileIds, allFolderIds);
   });
 };
+
+export const restoreFolderHierarchy = async (
+  folderId: string,
+  ownerId: string,
+): Promise<void> => {
+  const allFolderIds = await getFolderHierarchyIds(folderId, ownerId);
+
+  return prisma.$transaction(async (tx) => {
+    await tx.folder.updateMany({
+      where: {
+        id: {
+          in: allFolderIds,
+        },
+        ownerId,
+      },
+      data: {
+        isTrashed: false,
+        trashedAt: null,
+        updatedAt: new Date(),
+      },
+    });
+
+    await tx.file.updateMany({
+      where: {
+        folderId: {
+          in: allFolderIds,
+        },
+        ownerId,
+      },
+      data: {
+        isTrashed: false,
+        trashedAt: null,
+        updatedAt: new Date(),
+      },
+    });
+  });
+};

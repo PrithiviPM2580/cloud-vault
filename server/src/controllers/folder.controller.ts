@@ -5,6 +5,7 @@ import type {
   GetFoldersValidator,
   MoveFolderValidator,
   RenameFolderValidator,
+  RestoreFolderValidator,
   SoftDeleteValidator,
 } from "@/validator/folder.validator";
 import * as folderService from "@/services/folder.service";
@@ -122,5 +123,23 @@ export const softDeleteFolder: Controller<SoftDeleteValidator> = async (
   sendResponse(res, {
     statusCode: 200,
     message: "Folder deleted successfully",
+  });
+};
+
+export const restoreFolder: Controller<RestoreFolderValidator> = async (
+  req,
+  res,
+) => {
+  const userId = req.session?.user.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authenticated");
+  }
+
+  await folderService.restoreFolder(req.params, userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Folder restored successfully",
   });
 };
