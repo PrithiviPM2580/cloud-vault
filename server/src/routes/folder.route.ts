@@ -4,6 +4,7 @@ import {
   getFoldersValidator,
   moveFolderValidator,
   renameFolderValidator,
+  restoreFolderValidator,
   softDeleteFolderValidator,
 } from "@/validator/folder.validator";
 import { Router } from "express";
@@ -43,4 +44,8 @@ folderRouter
     softDeleteFolderValidator,
     folderController.softDeleteFolder,
   );
+
+folderRouter
+  .route("/:id/restore")
+  .patch(requireAuth, restoreFolderValidator, folderController.restoreFolder);
 export default folderRouter;
