@@ -136,7 +136,7 @@ export const restoreFolderHierarchy = async (
   });
 };
 
-const adjustUserStorageUsage = async (
+export const adjustUserStorageUsage = async (
   userId: string,
   sizeChange: number,
 ): Promise<number> => {
