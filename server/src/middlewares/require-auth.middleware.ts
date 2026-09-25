@@ -5,12 +5,13 @@ export const requireAuth = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
+): Promise<void> => {
   try {
     const session = await getSessionFromRequest(req);
 
     if (!session) {
-      return res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
+      return;
     }
 
     req.session = session;
@@ -18,6 +19,6 @@ export const requireAuth = async (
     next();
   } catch (error) {
     console.error("Error in requireAuth middleware:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

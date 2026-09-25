@@ -1,3 +1,6 @@
+import type { FileSort } from "@/schema/file.schema";
+import type { Prisma } from "@/generated/prisma/client";
+
 export const ERROR_CODE = {
   VALIDATION_ERROR: "VALIDATION_ERROR",
   ACCESS_UNAUTHORIZED: "ACCESS_UNAUTHORIZED",
@@ -11,3 +14,12 @@ export const ERROR_CODE = {
 
 export const MAX_FILE_SIZE = 100 * 1024 * 1024;
 export const MAX_FILE_COUNT = 10;
+
+export const sortMap: Record<FileSort, Prisma.FileOrderByWithRelationInput> = {
+  name_asc: { name: "asc" },
+  name_desc: { name: "desc" },
+  date_asc: { createdAt: "asc" },
+  date_desc: { createdAt: "desc" },
+  size_asc: { size: "asc" },
+  size_desc: { size: "desc" },
+};

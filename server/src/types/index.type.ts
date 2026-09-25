@@ -1,4 +1,4 @@
-import type { TypedRequestHandler } from "zod-express-validator";
+import type { Schemas, TypedRequest, TypedRequestHandler } from "zod-express-validator";
 import { ERROR_CODE } from "@/utils/constant.util";
 
 export type Controller<T> = TypedRequestHandler<T>;
