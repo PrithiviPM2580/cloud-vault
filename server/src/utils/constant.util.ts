@@ -8,3 +8,6 @@ export const ERROR_CODE = {
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
   BAD_REQUEST: "BAD_REQUEST",
 } as const;
+
+export const MAX_FILE_SIZE = 100 * 1024 * 1024;
+export const MAX_FILE_COUNT = 10;
