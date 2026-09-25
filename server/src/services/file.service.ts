@@ -1,9 +1,14 @@
-import type { File, User } from "@/generated/prisma/client";
+import type { File, Prisma,User} from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma-client.lib";
-import type { UploadFilesInput } from "@/schema/file.schema";
+import type {
+  GetFilesQuery,
+  Pagination,
+  UploadFilesInput,
+} from "@/schema/file.schema";
 import { AppError } from "@/utils/app-error.util";
 import { uploadFileToS3 } from "@/utils/s3.util";
 import * as storageService from "@/services/storage.service";
+import { sortMap } from "@/utils/constant.util";
 
 export const uploadFiles = async (
   files: Express.Multer.File[],
@@ -79,4 +84,52 @@ export const uploadFiles = async (
   await storageService.adjustUserStorageUsage(user.id, totalNewBytes);
 
   return createdFiles;
+};
+
+export const getFiles = async (
+  query: GetFilesQuery["query"],
+  ownerId: string,
+): Promise<{ files: File[]; pagination: Pagination }> => {
+  const { folderId, search, sort, page, limit } = query;
+
+  const skip = (page - 1) * limit;
+  const targetFolderId = folderId ?? null;
+
+  const orderBy = sortMap[sort];
+
+  const where: Prisma.FileWhereInput = {
+    ownerId: ownerId,
+    isTrashed: false,
+    folderId: targetFolderId,
+    ...(search
+      ? {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        }
+      : {}),
+  };
+
+  const [files, totalFiles] = await Promise.all([
+    prisma.file.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+    }),
+    prisma.file.count({
+      where,
+    }),
+  ]);
+
+  return {
+    files,
+    pagination: {
+      page,
+      limit,
+      totalFiles,
+      totalPages: Math.ceil(totalFiles / limit),
+    },
+  };
 };

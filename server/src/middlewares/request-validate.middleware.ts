@@ -2,7 +2,7 @@ import { formatError } from "@/utils/index.util";
 import { validate, type Schemas } from "zod-express-validator";
 import status from "http-status";
 
-export const validateRquest = (schemas: Schemas) => {
+export const validateRquest = <T extends Schemas>(schemas: T) => {
   return validate(schemas, ({ bodyError, queryError, paramsError }, res) => {
     const error = bodyError ?? queryError ?? paramsError;
 

@@ -10,3 +10,6 @@ Content-Type: multipart/form-data
   "file": "@/path/to/your/file.txt",
   "folderId": "{{folderId}}"
 }
+
+### Get Files
+GET {{api}}/files?folderId={{folderId}}
