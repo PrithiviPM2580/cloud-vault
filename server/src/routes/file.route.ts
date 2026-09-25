@@ -5,6 +5,7 @@ import {
   getFilePreviewUrlValidator,
   renameFileValidator,
   moveFileValidator,
+  softDeleteFileValidator,
 } from "@/validator/file.validator";
 import * as fileController from "@/controllers/file.controller";
 import { Router } from "express";
@@ -39,6 +40,13 @@ fileRouter.patch(
   requireAuth,
   moveFileValidator,
   fileController.moveFile,
+);
+
+fileRouter.delete(
+  "/:id",
+  requireAuth,
+  softDeleteFileValidator,
+  fileController.softDeleteFile,
 );
 
 export default fileRouter;

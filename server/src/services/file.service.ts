@@ -6,6 +6,7 @@ import type {
   MoveFileInput,
   Pagination,
   RenameFileInput,
+  SoftDeleteFileInput,
   UploadFilesInput,
 } from "@/schema/file.schema";
 import { AppError } from "@/utils/app-error.util";
@@ -243,4 +244,31 @@ export const moveFile = async (
   }
 
   return files;
+};
+
+export const softDeleteFile = async (
+  params: SoftDeleteFileInput["params"],
+  ownerId: string,
+): Promise<void> => {
+  const { id } = params;
+
+  await prisma.$transaction(async (tx) => {
+    const files = await tx.file.updateManyAndReturn({
+      where: {
+        id,
+        ownerId,
+        isTrashed: false,
+      },
+      data: {
+        isTrashed: true,
+        trashedAt: new Date(),
+      },
+    });
+
+    if (files.length === 0) {
+      throw AppError.notFound("File not found");
+    }
+
+    await storageService.cleanupShareLinks(tx, [id], []);
+  });
 };
