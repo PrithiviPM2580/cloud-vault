@@ -48,4 +48,10 @@ folderRouter
 folderRouter
   .route("/:id/restore")
   .patch(requireAuth, restoreFolderValidator, folderController.restoreFolder);
+
+folderRouter.route("/:id/permanent").delete(
+  requireAuth,
+  
+  folderController.permanentDeleteFolder,
+);
 export default folderRouter;

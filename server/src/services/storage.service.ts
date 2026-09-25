@@ -1,5 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma-client.lib";
+import { deleteMultipleFilesFromS3 } from "@/utils/s3.util";
 
 export const getFolderHierarchyIds = async (
   folderId: string,
@@ -132,5 +133,87 @@ export const restoreFolderHierarchy = async (
         updatedAt: new Date(),
       },
     });
+  });
+};
+
+const adjustUserStorageUsage = async (
+  userId: string,
+  sizeChange: number,
+): Promise<number> => {
+  const user = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      storageUsed: {
+        increment: sizeChange,
+      },
+      updatedAt: new Date(),
+    },
+    select: {
+      storageUsed: true,
+    },
+  });
+  return Number(user.storageUsed);
+};
+
+export const permanentlyDeleteFolderHierarchy = async (
+  folderId: string,
+  ownerId: string,
+): Promise<void> => {
+  const allFolderIds = await getFolderHierarchyIds(folderId, ownerId);
+
+  const files = await prisma.file.findMany({
+    where: {
+      folderId: {
+        in: allFolderIds,
+      },
+      ownerId,
+    },
+    select: {
+      id: true,
+      s3Key: true,
+      size: true,
+    },
+  });
+
+  const s3Keys = files.map((file) => file.s3Key);
+  const fileIds = files.map((file) => file.id);
+
+  const totalFreedSpace = files.reduce(
+    (acc, file) => acc + Number(file.size),
+    0,
+  );
+
+  await prisma.$transaction(async (tx) => {
+    await cleanupShareLinks(tx, fileIds, allFolderIds);
+
+    if (fileIds.length > 0) {
+      await tx.file.deleteMany({
+        where: {
+          id: {
+            in: fileIds,
+          },
+          ownerId,
+        },
+      });
+    }
+
+    await tx.folder.deleteMany({
+      where: {
+        id: {
+          in: allFolderIds,
+        },
+        ownerId,
+      },
+    });
+
+    if (s3Keys.length > 0) {
+      await deleteMultipleFilesFromS3(s3Keys);
+    }
+
+    if (totalFreedSpace > 0) {
+      await adjustUserStorageUsage(ownerId, -totalFreedSpace);
+    }
   });
 };

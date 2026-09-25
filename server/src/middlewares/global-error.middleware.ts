@@ -1,5 +1,5 @@
 import { appConfig } from "@/config/app.config";
-import { AppError } from "@/utils/app-error.utils";
+import { AppError } from "@/utils/app-error.util";
 import { ERROR_CODE } from "@/utils/constant.util";
 import { formatError } from "@/utils/index.util";
 import type { Request, Response, NextFunction } from "express";
