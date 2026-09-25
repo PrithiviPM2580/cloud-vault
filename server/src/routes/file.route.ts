@@ -3,6 +3,7 @@ import {
   getFilesValidator,
   uploadFilesValidator,
   getFilePreviewUrlValidator,
+  renameFileValidator,
 } from "@/validator/file.validator";
 import * as fileController from "@/controllers/file.controller";
 import { Router } from "express";
@@ -23,6 +24,13 @@ fileRouter.get(
   requireAuth,
   getFilePreviewUrlValidator,
   fileController.getFilePreviewUrl,
+);
+
+fileRouter.patch(
+  "/:id/rename",
+  requireAuth,
+  renameFileValidator,
+  fileController.renameFile,
 );
 
 export default fileRouter;

@@ -4,6 +4,7 @@ import type {
   GetFilePreviewUrlInput,
   GetFilesQuery,
   Pagination,
+  RenameFileInput,
   UploadFilesInput,
 } from "@/schema/file.schema";
 import { AppError } from "@/utils/app-error.util";
@@ -170,4 +171,30 @@ export const getFilePreviewUrl = async (
   const url = await getSignedUrlForS3Upload(file.s3Key);
 
   return { file, url };
+};
+
+export const renameFile = async (
+  params: RenameFileInput["params"],
+  body: RenameFileInput["body"],
+  ownerId: string,
+): Promise<File[]> => {
+  const { id } = params;
+  const { name } = body;
+
+  const files = await prisma.file.updateManyAndReturn({
+    where: {
+      id,
+      ownerId,
+      isTrashed: false,
+    },
+    data: {
+      name,
+    },
+  });
+
+  if (files.length === 0) {
+    throw AppError.notFound("File not found");
+  }
+
+  return files;
 };
