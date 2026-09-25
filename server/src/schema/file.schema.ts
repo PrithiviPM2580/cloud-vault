@@ -97,12 +97,27 @@ export const renameFileSchema = {
   }),
 };
 
+export const moveFileSchema = {
+  body: z.object({
+    folderId: z.string().nullable(),
+  }),
+  params: z.object({
+    id: z.string(),
+  }),
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: z.array(fileSchema),
+  }),
+};
+
 export type UploadFilesInput = InferSchemas<typeof uploadFilesSchema>;
 export type GetFilesQuery = InferSchemas<typeof getFilesSchema>;
 export type GetFilePreviewUrlInput = InferSchemas<
   typeof getFilePreviewUrlSchema
 >;
 export type RenameFileInput = InferSchemas<typeof renameFileSchema>;
+export type MoveFileInput = InferSchemas<typeof moveFileSchema>;
 
 export type FileSort = z.infer<typeof fileSortSchema>;
 export type Pagination = z.infer<typeof paginationSchema>;

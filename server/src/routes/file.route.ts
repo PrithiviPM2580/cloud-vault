@@ -4,6 +4,7 @@ import {
   uploadFilesValidator,
   getFilePreviewUrlValidator,
   renameFileValidator,
+  moveFileValidator,
 } from "@/validator/file.validator";
 import * as fileController from "@/controllers/file.controller";
 import { Router } from "express";
@@ -31,6 +32,13 @@ fileRouter.patch(
   requireAuth,
   renameFileValidator,
   fileController.renameFile,
+);
+
+fileRouter.patch(
+  "/:id/move",
+  requireAuth,
+  moveFileValidator,
+  fileController.moveFile,
 );
 
 export default fileRouter;
