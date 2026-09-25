@@ -12,7 +12,6 @@ import type {
 import * as folderService from "@/services/folder.service";
 import { AppError } from "@/utils/app-error.util";
 import { sendResponse } from "@/utils/send-response.util";
-import { APIError } from "better-auth";
 
 export const createFolder: Controller<CreateFolderValidator> = async (
   req,
@@ -145,10 +144,9 @@ export const restoreFolder: Controller<RestoreFolderValidator> = async (
   });
 };
 
-export const permanentDeleteFolder: Controller<PermanentDeleteFolderValidator> = async (
-  req,
-  res,
-) => {
+export const permanentDeleteFolder: Controller<
+  PermanentDeleteFolderValidator
+> = async (req, res) => {
   const userId = req.session?.user.id;
 
   if (!userId) {

@@ -2,6 +2,7 @@ import { requireAuth } from "@/middlewares/require-auth.middleware";
 import {
   getFilesValidator,
   uploadFilesValidator,
+  getFilePreviewUrlValidator,
 } from "@/validator/file.validator";
 import * as fileController from "@/controllers/file.controller";
 import { Router } from "express";
@@ -16,5 +17,12 @@ fileRouter.post(
 );
 
 fileRouter.get("/", requireAuth, getFilesValidator, fileController.getFiles);
+
+fileRouter.get(
+  "/:id/preview",
+  requireAuth,
+  getFilePreviewUrlValidator,
+  fileController.getFilePreviewUrl,
+);
 
 export default fileRouter;

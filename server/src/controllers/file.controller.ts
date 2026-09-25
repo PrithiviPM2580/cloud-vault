@@ -1,6 +1,7 @@
 import type { Controller } from "@/types/index.type";
 import { AppError } from "@/utils/app-error.util";
 import type {
+  GetFilePreviewUrlValidator,
   GetFilesValidator,
   UploadFilesValidator,
 } from "@/validator/file.validator";
@@ -14,13 +15,14 @@ export const uploadFiles: Controller<UploadFilesValidator> = async (
   if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
     throw AppError.badRequest("No files uploaded");
   }
-  const user = req.session?.user;
 
-  if (!user) {
+  const userId = req.session?.user.id;
+
+  if (!userId) {
     throw AppError.unauthorized("User not authorized");
   }
 
-  const files = await fileService.uploadFiles(req.files, user, req.body);
+  const files = await fileService.uploadFiles(req.files, userId, req.body);
 
   sendResponse(res, {
     statusCode: 201,
@@ -44,6 +46,28 @@ export const getFiles: Controller<GetFilesValidator> = async (req, res) => {
     data: {
       files,
       pagination,
+    },
+  });
+};
+
+export const getFilePreviewUrl: Controller<GetFilePreviewUrlValidator> = async (
+  req,
+  res,
+) => {
+  const userId = req.session?.user.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authorized");
+  }
+
+  const { file, url } = await fileService.getFilePreviewUrl(req.params, userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "File preview URL retrieved successfully",
+    data: {
+      file,
+      url,
     },
   });
 };
