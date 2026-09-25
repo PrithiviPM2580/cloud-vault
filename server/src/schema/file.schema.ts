@@ -83,11 +83,26 @@ export const getFilePreviewUrlSchema = {
   }),
 };
 
+export const renameFileSchema = {
+  body: z.object({
+    name: z.string().trim().min(1, "File name cannot be empty"),
+  }),
+  params: z.object({
+    id: z.string(),
+  }),
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: z.array(fileSchema),
+  }),
+};
+
 export type UploadFilesInput = InferSchemas<typeof uploadFilesSchema>;
 export type GetFilesQuery = InferSchemas<typeof getFilesSchema>;
 export type GetFilePreviewUrlInput = InferSchemas<
   typeof getFilePreviewUrlSchema
 >;
+export type RenameFileInput = InferSchemas<typeof renameFileSchema>;
 
 export type FileSort = z.infer<typeof fileSortSchema>;
 export type Pagination = z.infer<typeof paginationSchema>;

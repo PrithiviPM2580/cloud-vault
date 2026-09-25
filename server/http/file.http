@@ -1,6 +1,7 @@
 @baseUrl = http://localhost:3000
 @api = {{baseUrl}}/api
 @folderId = 757f60bc-cc6c-44c4-9824-c7b95c145e64
+@fileId = 757f60bc-cc6c-44c4-9824-c7b95c145e64
 
 ### Upload File
 POST {{api}}/files/upload
@@ -13,3 +14,14 @@ Content-Type: multipart/form-data
 
 ### Get Files
 GET {{api}}/files?folderId={{folderId}}
+
+### Preview File
+GET {{api}}/files/{{fileId}}/preview
+
+### Rename File
+PATCH {{api}}/files/{{fileId}}
+Content-Type: application/json
+
+{
+  "name": "new-file-name.txt"
+}
