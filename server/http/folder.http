@@ -32,3 +32,6 @@ Content-Type: application/json
 {
   "parentId": "new-parent-folder-id"
 }
+
+#### Soft Delete Folder
+DELETE  {{api}}/folders/{{folderId}}/soft-delete

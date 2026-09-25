@@ -7,8 +7,10 @@ import type {
   GetFoldersInput,
   MoveFolderInput,
   RenameFolderInput,
+  SoftDeleteFolderInput,
 } from "@/schema/folder.schema";
 import { AppError } from "@/utils/app-error.utils";
+import * as storageService from "@/services/storage.service";
 
 export const createFolder = async (
   data: CreateFolderInput["body"],
@@ -273,4 +275,25 @@ export const moveFolder = async (
   }
 
   return updatedFolder;
+};
+
+export const softDeleteFolder = async (
+  params: SoftDeleteFolderInput["params"],
+  ownerId: string,
+): Promise<void> => {
+  const { id } = params;
+
+  const folder = await prisma.folder.findFirst({
+    where: {
+      id,
+      ownerId,
+      isTrashed: false,
+    },
+  });
+
+  if (!folder) {
+    throw AppError.notFound("Folder not found");
+  }
+
+  await storageService.softDeleteFolderHierarchy(folder.id, ownerId);
 };

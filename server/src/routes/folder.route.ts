@@ -4,6 +4,7 @@ import {
   getFoldersValidator,
   moveFolderValidator,
   renameFolderValidator,
+  softDeleteFolderValidator,
 } from "@/validator/folder.validator";
 import { Router } from "express";
 import * as folderController from "@/controllers/folder.controller";
@@ -20,7 +21,7 @@ folderRouter
   .get(requireAuth, getFoldersValidator, folderController.getFolders);
 
 folderRouter
-  .route("/:folderId")
+  .route("/:id")
   .get(
     requireAuth,
     getFolderDetailsValidator,
@@ -28,10 +29,18 @@ folderRouter
   );
 
 folderRouter
-  .route("/:folderId/rename")
+  .route("/:id/rename")
   .patch(requireAuth, renameFolderValidator, folderController.renameFolder);
 
 folderRouter
-  .route("/:folderId/move")
+  .route("/:id/move")
   .patch(requireAuth, moveFolderValidator, folderController.moveFolder);
+
+folderRouter
+  .route("/:id")
+  .delete(
+    requireAuth,
+    softDeleteFolderValidator,
+    folderController.softDeleteFolder,
+  );
 export default folderRouter;

@@ -83,10 +83,21 @@ export const moveFolderSchema = {
   }),
 };
 
+export const softDeleteFolderSchema = {
+  params: z.object({
+    id: z.uuid(),
+  }),
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+  }),
+};
+
 export type CreateFolderInput = InferSchemas<typeof createFolderSchema>;
 export type GetFoldersInput = InferSchemas<typeof getFoldersSchema>;
 export type GetFolderDetailsInput = InferSchemas<typeof getFolderDetailsSchema>;
 export type RenameFolderInput = InferSchemas<typeof renameFolderSchema>;
 export type MoveFolderInput = InferSchemas<typeof moveFolderSchema>;
+export type SoftDeleteFolderInput = InferSchemas<typeof softDeleteFolderSchema>;
 
 export type Breadcrumb = z.infer<typeof breadcrumbSchema>;
