@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { InferSchemas } from "zod-express-validator";
 
-const fileSchema = z.object({
+export const fileSchema = z.object({
   folderId: z.string().nullable(),
   id: z.string(),
   name: z.string(),
