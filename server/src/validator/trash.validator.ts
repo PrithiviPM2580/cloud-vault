@@ -1,6 +1,8 @@
 import { validateRquest } from "@/middlewares/request-validate.middleware";
-import { getTrashItemsSchema } from "@/schema/trash.schema";
+import { emptyTrashSchema, getTrashItemsSchema } from "@/schema/trash.schema";
 
 export const getTrashItemsValidator = validateRquest(getTrashItemsSchema);
+export const emptyTrashValidator = validateRquest(emptyTrashSchema);
 
 export type GetTrashItemsValidator = typeof getTrashItemsSchema;
+export type EmptyTrashValidator = typeof emptyTrashSchema;

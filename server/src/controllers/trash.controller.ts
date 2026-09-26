@@ -1,6 +1,6 @@
 import type { Controller } from "@/types/index.type";
 import { AppError } from "@/utils/app-error.util";
-import type { GetTrashItemsValidator } from "@/validator/trash.validator";
+import type { EmptyTrashValidator, GetTrashItemsValidator } from "@/validator/trash.validator";
 import * as trashService from "@/services/trash.service";
 import { sendResponse } from "@/utils/send-response.util";
 
@@ -25,3 +25,19 @@ export const getTrashItems: Controller<GetTrashItemsValidator> = async (
     },
   });
 };
+
+export const emptyTrash: Controller<EmptyTrashValidator> = async (req, res) => {
+
+  const userId = req.session?.user.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authorized");
+  }
+  
+  await trashService.emptyTrash(userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Trash emptied successfully",
+  });
+}

@@ -12,3 +12,10 @@ export const getTrashItemsSchema = {
     }),
   }),
 };
+
+export const emptyTrashSchema = {
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+  }),
+};
