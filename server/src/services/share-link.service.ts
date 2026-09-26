@@ -69,3 +69,51 @@ export const createShareLink = async (
     isExisting: false,
   };
 };
+
+export const getShareLinks = async (ownerId: string): Promise<ShareLink[]> => {
+  const shareLinks = await prisma.shareLink.findMany({
+    where: {
+      ownerId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const shareLinksWithResource = await Promise.all(
+    shareLinks.map(async (shareLink) => {
+      let resource;
+
+      if (shareLink.resourceType === "file") {
+        resource = await prisma.file.findUnique({
+          where: {
+            id: shareLink.resourceId,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+      }
+
+      if (shareLink.resourceType === "folder") {
+        resource = await prisma.folder.findUnique({
+          where: {
+            id: shareLink.resourceId,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+      }
+
+      return {
+        ...shareLink,
+        resource,
+      };
+    }),
+  );
+
+  return shareLinksWithResource;
+};

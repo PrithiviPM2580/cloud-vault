@@ -1,4 +1,7 @@
-import { createShareLinkValidator } from "@/validator/share-link.validator";
+import {
+  createShareLinkValidator,
+  getShareLinksValidator,
+} from "@/validator/share-link.validator";
 import { Router } from "express";
 import * as shareLinkController from "@/controllers/share-link.controller";
 
@@ -8,6 +11,12 @@ shareLinkRouter.get(
   "/",
   createShareLinkValidator,
   shareLinkController.createShareLink,
+);
+
+shareLinkRouter.get(
+  "/",
+  getShareLinksValidator,
+  shareLinkController.getShareLinks,
 );
 
 export default shareLinkRouter;

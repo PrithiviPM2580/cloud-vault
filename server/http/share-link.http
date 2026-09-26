@@ -12,3 +12,6 @@ Content-Type: application/json
     "permission":"download",
     "expiresAt": "2024-12-31T23:59:59Z"
 }
+
+#### Get Share Link
+GET {{api}}/shares/
