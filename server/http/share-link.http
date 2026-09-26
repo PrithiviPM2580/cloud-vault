@@ -19,3 +19,6 @@ GET {{api}}/shares/
 
 #### Access Share Link
 GET {{api}}/shares/access/{{token}}
+
+#### Delete Share Link
+DELETE {{api}}/shares/{{token}}
