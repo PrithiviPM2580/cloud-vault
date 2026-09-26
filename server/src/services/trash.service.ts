@@ -1,5 +1,6 @@
 import type { File, Folder } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma-client.lib";
+import * as storageService from "@/services/storage.service";
 
 export const getTrashItems = async (
   ownerId: string,
@@ -26,4 +27,8 @@ export const getTrashItems = async (
   ]);
 
   return { files, folders };
+};
+
+export const emptyTrash = async (ownerId: string): Promise<void> => {
+  await storageService.emptyTrashHierarchy(ownerId);
 };
