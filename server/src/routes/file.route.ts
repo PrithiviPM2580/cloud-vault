@@ -6,6 +6,8 @@ import {
   renameFileValidator,
   moveFileValidator,
   softDeleteFileValidator,
+  restoreFileValidator,
+  permanentlyDeleteFileValidator,
 } from "@/validator/file.validator";
 import * as fileController from "@/controllers/file.controller";
 import { Router } from "express";
@@ -52,8 +54,15 @@ fileRouter.delete(
 fileRouter.post(
   "/:id/restore",
   requireAuth,
-  softDeleteFileValidator,
+  restoreFileValidator,
   fileController.restoreFile,
+);
+
+fileRouter.delete(
+  "/:id/permanent",
+  requireAuth,
+  permanentlyDeleteFileValidator,
+  fileController.permanentlyDeleteFile,
 );
 
 export default fileRouter;

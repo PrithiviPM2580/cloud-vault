@@ -39,3 +39,6 @@ DELETE {{api}}/files/{{fileId}}/soft-delete
 
 ### Restore File
 POST {{api}}/files/{{fileId}}/restore
+
+### Permanently Delete File
+DELETE {{api}}/files/{{fileId}}/permanently-delete
