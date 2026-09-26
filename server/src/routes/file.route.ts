@@ -49,4 +49,11 @@ fileRouter.delete(
   fileController.softDeleteFile,
 );
 
+fileRouter.post(
+  "/:id/restore",
+  requireAuth,
+  softDeleteFileValidator,
+  fileController.restoreFile,
+);
+
 export default fileRouter;
