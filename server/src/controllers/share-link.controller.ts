@@ -3,6 +3,7 @@ import { AppError } from "@/utils/app-error.util";
 import type {
   AccessShareLinkValidator,
   CreateShareLinkValidator,
+  DeleteShareLinkValidator,
   GetShareLinksValidator,
 } from "@/validator/share-link.validator";
 import * as shareLinkService from "@/services/share-link.service";
@@ -68,3 +69,19 @@ export const accessShareLink: Controller<AccessShareLinkValidator> = async (
     data: result,
   });
 };
+
+export const deleteShareLink: Controller<DeleteShareLinkValidator> = async (req, res) => {
+
+    const userId = req.session?.user.id;
+    
+    if (!userId) {
+      throw AppError.unauthorized("User not authenticated");
+    }
+
+    await shareLinkService.deleteShareLink(req.params, userId);
+    
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Share link deleted successfully",
+    });
+}

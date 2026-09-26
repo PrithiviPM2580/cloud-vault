@@ -66,6 +66,17 @@ export const accessShareLinkSchema = {
   }),
 };
 
+export const deleteShareLinkSchema = {
+  params: z.object({
+    id: z.string(),
+  }),
+
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+  }),
+};
+
 export type CreateShareLinkInput = InferSchemas<
   typeof createShareLinkSchema
 >["body"];
@@ -75,3 +86,6 @@ export type AccessShareLinkParams = InferSchemas<
 export type AccessShareLinkResult = InferSchemas<
   typeof accessShareLinkSchema
 >["res"]["data"];
+export type DeleteShareLinkParams = InferSchemas<
+  typeof deleteShareLinkSchema
+>["params"];

@@ -4,6 +4,7 @@ import type {
   AccessShareLinkParams,
   AccessShareLinkResult,
   CreateShareLinkInput,
+  DeleteShareLinkParams,
 } from "@/schema/share-link.schema";
 import { AppError } from "@/utils/app-error.util";
 import { getSignedUrlForS3Upload } from "@/utils/s3.util";
@@ -209,4 +210,28 @@ export const accessShareLink = async (
   }
 
   throw AppError.badRequest("Invalid resource type");
+};
+
+export const deleteShareLink = async (
+  params: DeleteShareLinkParams,
+  ownerId: string,
+): Promise<void> => {
+  const { id } = params;
+
+  const link = await prisma.shareLink.findFirst({
+    where: {
+      id,
+      ownerId,
+    },
+  });
+
+  if (!link) {
+    throw AppError.notFound("Share link not found");
+  }
+
+  await prisma.shareLink.delete({
+    where: {
+      id: link.id,
+    },
+  });
 };
