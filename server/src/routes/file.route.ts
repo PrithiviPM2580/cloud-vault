@@ -11,6 +11,7 @@ import {
 } from "@/validator/file.validator";
 import * as fileController from "@/controllers/file.controller";
 import { Router } from "express";
+import { uploadMultipleFiles } from "@/middlewares/multer.middleware";
 
 const fileRouter = Router();
 
@@ -18,6 +19,7 @@ fileRouter.post(
   "/upload",
   requireAuth,
   uploadFilesValidator,
+  uploadMultipleFiles("files"),
   fileController.uploadFiles,
 );
 
