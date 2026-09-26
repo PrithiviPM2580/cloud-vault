@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:3000
+@api = {{baseUrl}}/api
+@resourceId = 757f60bc-cc6c-44c4-9824-c7b95c145e64
+
+### Create Share Link
+POST {{api}}/shares
+Content-Type: application/json
+
+{
+    "resourceId": "{{resourceId}}",
+    "resourceType": "folder",
+    "permission":"download",
+    "expiresAt": "2024-12-31T23:59:59Z"
+}
