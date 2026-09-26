@@ -1,4 +1,5 @@
 import {
+  accessShareLinkValidator,
   createShareLinkValidator,
   getShareLinksValidator,
 } from "@/validator/share-link.validator";
@@ -17,6 +18,12 @@ shareLinkRouter.get(
   "/",
   getShareLinksValidator,
   shareLinkController.getShareLinks,
+);
+
+shareLinkRouter.get(
+  "/access/:token",
+  accessShareLinkValidator,
+  shareLinkController.accessShareLink,
 );
 
 export default shareLinkRouter;

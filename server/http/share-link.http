@@ -1,6 +1,7 @@
 @baseUrl = http://localhost:3000
 @api = {{baseUrl}}/api
 @resourceId = 757f60bc-cc6c-44c4-9824-c7b95c145e64
+@token = 123
 
 ### Create Share Link
 POST {{api}}/shares
@@ -15,3 +16,6 @@ Content-Type: application/json
 
 #### Get Share Link
 GET {{api}}/shares/
+
+#### Access Share Link
+GET {{api}}/shares/access/{{token}}

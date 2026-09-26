@@ -1,6 +1,7 @@
 import type { Controller } from "@/types/index.type";
 import { AppError } from "@/utils/app-error.util";
 import type {
+  AccessShareLinkValidator,
   CreateShareLinkValidator,
   GetShareLinksValidator,
 } from "@/validator/share-link.validator";
@@ -52,5 +53,18 @@ export const getShareLinks: Controller<GetShareLinksValidator> = async (
     data: {
       shareLinks,
     },
+  });
+};
+
+export const accessShareLink: Controller<AccessShareLinkValidator> = async (
+  req,
+  res,
+) => {
+  const result = await shareLinkService.accessShareLink(req.params);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Share link accessed successfully",
+    data: result,
   });
 };
