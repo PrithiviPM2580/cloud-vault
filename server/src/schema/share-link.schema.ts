@@ -31,6 +31,16 @@ export const createShareLinkSchema = {
   }),
 };
 
+export const getShareLinksSchema = {
+  res: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: z.object({
+      shareLinks: z.array(shareLinkSchema),
+    }),
+  }),
+};
+
 export type CreateShareLinkInput = InferSchemas<
   typeof createShareLinkSchema
 >["body"];
