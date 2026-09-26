@@ -5,6 +5,7 @@ import type {
   GetFilesValidator,
   MoveFileValidator,
   RenameFileValidator,
+  RestoreFileValidator,
   SoftDeleteFileValidator,
   UploadFilesValidator,
 } from "@/validator/file.validator";
@@ -107,10 +108,12 @@ export const moveFile: Controller<MoveFileValidator> = async (req, res) => {
   });
 };
 
-export const softDeleteFile: Controller<SoftDeleteFileValidator> = async (req, res) => {
-
+export const softDeleteFile: Controller<SoftDeleteFileValidator> = async (
+  req,
+  res,
+) => {
   const userId = req.session?.user.id;
-  
+
   if (!userId) {
     throw AppError.unauthorized("User not authorized");
   }
@@ -121,4 +124,22 @@ export const softDeleteFile: Controller<SoftDeleteFileValidator> = async (req, r
     statusCode: 200,
     message: "File deleted successfully",
   });
-}
+};
+
+export const restoreFile: Controller<RestoreFileValidator> = async (
+  req,
+  res,
+) => {
+  const userId = req.session?.user.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authorized");
+  }
+
+  await fileService.restoreFile(req.params, userId);
+
+  sendResponse(res, {
+    statusCode: 201,
+    message: "File restored successfully",
+  });
+};

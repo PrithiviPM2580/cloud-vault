@@ -121,6 +121,8 @@ export const softDeleteFileSchema = {
   }),
 };
 
+export const restoreFileSchema = softDeleteFileSchema;
+
 export type UploadFilesInput = InferSchemas<typeof uploadFilesSchema>;
 export type GetFilesQuery = InferSchemas<typeof getFilesSchema>;
 export type GetFilePreviewUrlInput = InferSchemas<
@@ -129,6 +131,7 @@ export type GetFilePreviewUrlInput = InferSchemas<
 export type RenameFileInput = InferSchemas<typeof renameFileSchema>;
 export type MoveFileInput = InferSchemas<typeof moveFileSchema>;
 export type SoftDeleteFileInput = InferSchemas<typeof softDeleteFileSchema>;
+export type RestoreFileInput = InferSchemas<typeof restoreFileSchema>;
 
 export type FileSort = z.infer<typeof fileSortSchema>;
 export type Pagination = z.infer<typeof paginationSchema>;
