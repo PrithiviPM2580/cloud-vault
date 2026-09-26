@@ -4,6 +4,7 @@ import type {
   GetFilePreviewUrlValidator,
   GetFilesValidator,
   MoveFileValidator,
+  PermanentlyDeleteFileValidator,
   RenameFileValidator,
   RestoreFileValidator,
   SoftDeleteFileValidator,
@@ -143,3 +144,19 @@ export const restoreFile: Controller<RestoreFileValidator> = async (
     message: "File restored successfully",
   });
 };
+
+export const permanentlyDeleteFile: Controller<PermanentlyDeleteFileValidator> = async (req, res) => {
+
+  const userId = req.session?.user.id;
+
+  if (!userId) {
+    throw AppError.unauthorized("User not authorized");
+  }
+
+  await fileService.permanentlyDeleteFile(req.params, userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    message: "File permanently deleted successfully",
+  });
+}

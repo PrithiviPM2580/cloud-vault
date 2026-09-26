@@ -3,6 +3,7 @@ import {
   getFilePreviewUrlSchema,
   getFilesSchema,
   moveFileSchema,
+  permanentlyDeleteFileSchema,
   renameFileSchema,
   restoreFileSchema,
   softDeleteFileSchema,
@@ -18,6 +19,7 @@ export const renameFileValidator = validateRquest(renameFileSchema);
 export const moveFileValidator = validateRquest(moveFileSchema);
 export const softDeleteFileValidator = validateRquest(softDeleteFileSchema);
 export const restoreFileValidator = validateRquest(restoreFileSchema);
+export const permanentlyDeleteFileValidator = validateRquest(permanentlyDeleteFileSchema);
 
 export type UploadFilesValidator = typeof uploadFilesSchema;
 export type GetFilesValidator = typeof getFilesSchema;
@@ -26,3 +28,4 @@ export type RenameFileValidator = typeof renameFileSchema;
 export type MoveFileValidator = typeof moveFileSchema;
 export type SoftDeleteFileValidator = typeof softDeleteFileSchema;
 export type RestoreFileValidator = typeof restoreFileSchema;
+export type PermanentlyDeleteFileValidator = typeof permanentlyDeleteFileSchema;

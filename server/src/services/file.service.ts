@@ -5,13 +5,18 @@ import type {
   GetFilesQuery,
   MoveFileInput,
   Pagination,
+  PermanentlyDeleteFileInput,
   RenameFileInput,
   RestoreFileInput,
   SoftDeleteFileInput,
   UploadFilesInput,
 } from "@/schema/file.schema";
 import { AppError } from "@/utils/app-error.util";
-import { getSignedUrlForS3Upload, uploadFileToS3 } from "@/utils/s3.util";
+import {
+  deleteFileFromS3,
+  getSignedUrlForS3Upload,
+  uploadFileToS3,
+} from "@/utils/s3.util";
 import * as storageService from "@/services/storage.service";
 import { sortMap } from "@/utils/constant.util";
 import { file } from "bun";
@@ -298,4 +303,36 @@ export const restoreFile = async (
   if (files.length === 0) {
     throw AppError.notFound("File not found");
   }
+};
+
+export const permanentlyDeleteFile = async (
+  params: PermanentlyDeleteFileInput["params"],
+  ownerId: string,
+): Promise<void> => {
+  const { id } = params;
+
+  const file = await prisma.file.findFirst({
+    where: {
+      id,
+      ownerId,
+    },
+  });
+
+  if (!file) {
+    throw AppError.notFound("File not found");
+  }
+
+  await deleteFileFromS3(file.s3Key);
+
+  await prisma.$transaction(async (tx) => {
+    await storageService.cleanupShareLinks(tx, [file.id], []);
+
+    await tx.file.delete({
+      where: {
+        id: file.id,
+      },
+    });
+  });
+
+  await storageService.adjustUserStorageUsage(ownerId, -Number(file.size));
 };
